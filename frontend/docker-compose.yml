@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: .
+    container_name: dicri-frontend
+    ports:
+      - "8080:80"         
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - dicri-network
+    restart: unless-stopped
+
+networks:
+  dicri-network:
+    external: true

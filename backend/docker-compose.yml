@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: dicri-sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=DicriPassword123!
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - dicri-network
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U SA -P "DicriPassword123!" -Q "SELECT 1" -No
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    build: .
+    container_name: dicri-backend
+    environment:
+      - NODE_ENV=development
+      - PORT=3007
+      - DB_SERVER=sqlserver
+      - DB_DATABASE=DICRI_DB
+      - DB_USER=sysadmin_dicridb
+      - DB_PASSWORD=DicriPassword123!
+      - JWT_SECRET=dicri_jwt_secret_key_2025
+      - CHOKIDAR_USEPOLLING=1
+    ports:
+      - "3007:3007"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    networks:
+      - dicri-network
+    volumes:
+      - ./src:/app/src   
+      - ./.env:/app/.env:ro
+
+volumes:
+  sqlserver_data:
+
+networks:
+  dicri-network:
+    driver: bridge
+    name: dicri-network
