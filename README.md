@@ -26,6 +26,9 @@ Ir a la carpeta backend y ejecutar:
 cd backend
 docker compose up -d --build
 
+NOTA: Para fines de la prueba se subio el archivo .env a github, 
+pero una buena practica es no subirlo
+
 Esto iniciará:
 
 SQL Server en el puerto 1433
@@ -38,9 +41,7 @@ http://localhost:3001/api-docs
 2️⃣ Levantar Frontend
 Ir a la carpeta frontend y ejecutar:
 
-bash
-Copiar
-Editar
+
 cd ../frontend
 docker compose up -d --build
 Esto iniciará:
