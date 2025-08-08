@@ -66,26 +66,29 @@ const createTables = async () => {
     ------------------------------------------------
     -- EXPEDIENTES
     ------------------------------------------------
-    IF NOT EXISTS (SELECT 1 FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[expedientes]') AND type = 'U')
-    BEGIN
-        CREATE TABLE dbo.expedientes(
-            id                    INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_expedientes PRIMARY KEY,
-            codigo                NVARCHAR(40)      NOT NULL,
-            descripcion           NVARCHAR(1000)    NOT NULL,
-            ubicacion             NVARCHAR(300)     NOT NULL,
-            fecha_hecho           DATETIME          NOT NULL,
-            tipo_delito           NVARCHAR(100)     NOT NULL,
-            observaciones         NVARCHAR(MAX)     NULL,
-            estado                NVARCHAR(50)      NOT NULL CONSTRAINT DF_expedientes_estado DEFAULT ('Borrador'),
-            is_active             BIT               NOT NULL CONSTRAINT DF_expedientes_is_active DEFAULT (1),
-            tecnico_registra_id   INT               NOT NULL,
-            coordinador_revisa_id INT               NULL,
-            justificacion_rechazo NVARCHAR(MAX)     NULL,
-            fecha_registro        DATETIME          NOT NULL CONSTRAINT DF_expedientes_fecha_registro DEFAULT (GETDATE()),
-            fecha_revision        DATETIME          NULL,
-            FOREIGN KEY (tecnico_registra_id)   REFERENCES usuarios(id),
-            FOREIGN KEY (coordinador_revisa_id) REFERENCES usuarios(id)
-        );
+      IF NOT EXISTS (SELECT 1 FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[expedientes]') AND type = 'U')
+        BEGIN
+        CREATE TABLE dbo.expedientes (
+        id                    INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_expedientes PRIMARY KEY,
+        codigo                NVARCHAR(40)      NOT NULL,
+        descripcion           NVARCHAR(1000)    NOT NULL,
+        ubicacion             NVARCHAR(300)     NOT NULL,
+        fecha_hecho           DATETIME          NOT NULL,
+        tipo_delito           NVARCHAR(100)     NOT NULL,
+        observaciones         NTEXT              NULL,
+        estado                NVARCHAR(50)      NOT NULL CONSTRAINT DF_expedientes_estado DEFAULT ('Borrador'),
+        tecnico_registra_id   INT               NOT NULL,
+        coordinador_revisa_id INT               NULL,
+        justificacion_rechazo NTEXT              NULL,
+        fecha_registro        DATETIME          NOT NULL CONSTRAINT DF_expedientes_fecha_registro DEFAULT (GETDATE()),
+        fecha_revision        DATETIME          NULL,
+        numero_caso           VARCHAR(50)       NULL,
+        prioridad             VARCHAR(50)       NULL,
+        is_active             BIT               NOT NULL CONSTRAINT DF_expedientes_is_active DEFAULT (1),
+        FOREIGN KEY (tecnico_registra_id)   REFERENCES usuarios(id),
+        FOREIGN KEY (coordinador_revisa_id) REFERENCES usuarios(id)
+    );
+
     END;
 
     -- UQ en codigo
@@ -100,31 +103,32 @@ const createTables = async () => {
     ------------------------------------------------
     IF NOT EXISTS (SELECT 1 FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[indicios]') AND type = 'U')
     BEGIN
-        CREATE TABLE dbo.indicios(
-            id                    INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_indicios PRIMARY KEY,
-            codigo                NVARCHAR(40)      NOT NULL,
-            expediente_id         INT               NOT NULL,
-            descripcion           NVARCHAR(1000)    NOT NULL,
-            color                 NVARCHAR(100)     NULL,
-            tamaño                NVARCHAR(100)     NULL,
-            peso                  NVARCHAR(100)     NULL,
-            tipo                  NVARCHAR(100)     NULL,
-            fecha_recoleccion     DATE              NULL,
-            cadena_custodia       NVARCHAR(100)     NULL,
-            ubicacion             NVARCHAR(300)     NULL,
-            observaciones         NVARCHAR(MAX)     NULL,
-            tecnico_registra_id   INT               NOT NULL,
-            fecha_registro        DATETIME          NOT NULL CONSTRAINT DF_indicios_fecha_registro DEFAULT (GETDATE()),
-            numero_evidencia      VARCHAR(100)      NULL,
-            estado                VARCHAR(50)       NULL CONSTRAINT DF_indicios_estado DEFAULT ('Borrador'),
-            is_active             BIT               NOT NULL CONSTRAINT DF_indicios_is_active DEFAULT (1),
-            razon_rechazo         NVARCHAR(1000)    NULL,
-            fecha_revision        DATETIME          NULL,
-            coordinador_revisa_id INT               NULL,
-            FOREIGN KEY (expediente_id)       REFERENCES expedientes(id) ON DELETE CASCADE,
-            FOREIGN KEY (tecnico_registra_id) REFERENCES usuarios(id),
-            FOREIGN KEY (coordinador_revisa_id) REFERENCES usuarios(id)
-        );
+      CREATE TABLE dbo.indicios (
+        id                    INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_indicios PRIMARY KEY,
+        codigo                NVARCHAR(40)      NOT NULL,
+        expediente_id         INT               NOT NULL,
+        descripcion           NVARCHAR(1000)    NOT NULL,
+        color                 NVARCHAR(100)     NULL,
+        tamanio               NVARCHAR(100)     NULL,
+        peso                  NVARCHAR(100)     NULL,
+        ubicacion             NVARCHAR(300)     NULL,
+        observaciones         NTEXT              NULL,
+        tecnico_registra_id   INT               NOT NULL,
+        fecha_registro        DATETIME          NOT NULL CONSTRAINT DF_indicios_fecha_registro DEFAULT (GETDATE()),
+        numero_evidencia      VARCHAR(100)      NULL,
+        tipo                  VARCHAR(100)      NULL,
+        fecha_recoleccion     DATE              NULL,
+        cadena_custodia       VARCHAR(100)      NULL,
+        is_active             BIT               NOT NULL CONSTRAINT DF_indicios_is_active DEFAULT (1),
+        estado                VARCHAR(50)       NULL CONSTRAINT DF_indicios_estado DEFAULT ('Borrador'),
+        razon_rechazo         NVARCHAR(1000)    NULL,
+        fecha_revision        DATETIME          NULL,
+        coordinador_revisa_id INT               NULL,
+        FOREIGN KEY (expediente_id)         REFERENCES expedientes(id) ON DELETE CASCADE,
+        FOREIGN KEY (tecnico_registra_id)   REFERENCES usuarios(id),
+        FOREIGN KEY (coordinador_revisa_id) REFERENCES usuarios(id)
+    );
+
     END;
     `);
 
